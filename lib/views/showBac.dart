@@ -7,8 +7,8 @@ import '../models/Qualite.dart';
 import '../models/Presentation.dart';
 import '../models/TypeBac.dart';
 
-//import '../views/addBac.dart';
-//import '../views/editBac.dart';
+import '../views/addBac.dart';
+import '../views/editBac.dart';
 
 import 'package:intl/intl.dart'; // Format Date
 
@@ -40,6 +40,14 @@ class _ShowBacState extends State<ShowBac> {
             ),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddBac()),
+                ).then((result) {
+                  if (result == 'refresh') {
+                    setState(() {});
+                  }
+                });
               },
               child: Text('Ajouter un bac'),
             ),
@@ -51,7 +59,10 @@ class _ShowBacState extends State<ShowBac> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                  return Text('\n\nTotal de bac: ${snapshot.data!.length}');
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Text('Total de bac: ${snapshot.data!.length}'),
+                  );
                 }
               },
             ),
@@ -171,11 +182,49 @@ class _ShowBacState extends State<ShowBac> {
                                     IconButton(
                                       icon: const Icon(Icons.edit),
                                       onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditBac(bacId: bac.id!),
+                                          ),
+                                        ).then((result) {
+                                          if (result == 'refresh') {
+                                            setState(() {});
+                                          }
+                                        });
                                       },
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.delete),
                                       onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text('Confirmation'),
+                                              content: Text('Voulez-vous vraiment supprimer ce bac ?'),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: Text('Annuler'),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                                TextButton(
+                                                  child: Text('Supprimer'),
+                                                  onPressed: () async {
+                                                    await _databaseHelper.deleteBac(bac.id!);
+                                                    setState(() {});
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Bac supprimé avec succès')),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                     ),
                                   ],

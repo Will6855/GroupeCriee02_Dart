@@ -200,7 +200,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<Bac?> getBacById(int id) async {
-    final Database db = await database; // Ensure 'database' is your database instance
+    final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('bac',
         where: 'id = ?',
         whereArgs: [id]);
@@ -210,6 +210,47 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
     }
     return null;
   }
+
+  Future<List<Bac>> getBacsForEspeceByWeek(int idEspece) async {
+    final Database db = await database;
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final endOfWeek = startOfWeek.add(Duration(days: 6));
+
+    final startOfWeekFormatted = startOfWeek.toIso8601String().split('T')[0];
+    final endOfWeekFormatted = endOfWeek.toIso8601String().split('T')[0];
+
+    print('Start of Week: $startOfWeekFormatted');
+    print('End of Week: $endOfWeekFormatted');
+
+    final List<Map<String, dynamic>> maps = await db.query('bac',
+        where: 'idEspece = ? AND datePeche BETWEEN ? AND ?',
+        whereArgs: [idEspece, startOfWeekFormatted, endOfWeekFormatted]);
+
+    print('Query Result: $maps');
+
+    return List.generate(maps.length, (i) {
+      return Bac.fromMap(maps[i]);
+    });
+  }
+
+
+  Future<List<Bac>> getBacsForYear(int year) async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.query('bac',
+        where: 'datePeche LIKE ?',
+        whereArgs: ['%$year%']);
+
+    return List.generate(maps.length, (i) {
+      return Bac.fromMap(maps[i]);
+    });
+  }
+
+
+
+
+
+
 
   Future<int> deleteBac(int id) async {
     Database db = await database;
@@ -259,7 +300,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
 
 
   Future<List<Taille>> getTailles() async {
-    Database db = await database; // Ensure 'database' is your database instance
+    Database db = await database;
     List<Map<String, dynamic>> maps = await db.query('taille');
     List<Taille> tailles = [];
     for (var map in maps) {
@@ -269,7 +310,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<Taille?> getTailleById(int id) async {
-    final Database db = await database; // Ensure 'database' is your database instance
+    final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('taille',
         where: 'id = ?',
         whereArgs: [id]);
@@ -282,7 +323,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
 
 
   Future<List<Qualite>> getQualites() async {
-    Database db = await database; // Ensure 'database' is your database instance
+    Database db = await database;
     List<Map<String, dynamic>> maps = await db.query('qualite');
     List<Qualite> qualites = [];
     for (var map in maps) {
@@ -292,7 +333,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<Qualite?> getQualiteById(String id) async {
-    final Database db = await database; // Ensure 'database' is your database instance
+    final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('qualite',
         where: 'id = ?',
         whereArgs: [id]);
@@ -304,7 +345,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<List<Presentation>> getPresentations() async {
-    Database db = await database; // Ensure 'database' is your database instance
+    Database db = await database;
     List<Map<String, dynamic>> maps = await db.query('presentation');
     List<Presentation> presentations = [];
     for (var map in maps) {
@@ -314,7 +355,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<Presentation?> getPresentationById(String id) async {
-    final Database db = await database; // Ensure 'database' is your database instance
+    final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('presentation',
         where: 'id = ?',
         whereArgs: [id]);
@@ -326,7 +367,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<List<TypeBac>> getTypeBacs() async {
-    Database db = await database; // Ensure 'database' is your database instance
+    Database db = await database;
     List<Map<String, dynamic>> maps = await db.query('typebac');
     List<TypeBac> typebacs = [];
     for (var map in maps) {
@@ -336,7 +377,7 @@ INSERT INTO `typebac` (`id`, `tare`) VALUES
   }
 
   Future<TypeBac?> getTypeBacById(String id) async {
-    final Database db = await database; // Ensure 'database' is your database instance
+    final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('typebac',
         where: 'id = ?',
         whereArgs: [id]);
